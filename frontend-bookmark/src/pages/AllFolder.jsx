@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 export default function AllFolder() {
   const [folders, setFolders] = useState([]);
@@ -28,11 +29,14 @@ export default function AllFolder() {
               />
               <div className="card-body">
                 <h5 className="card-title">{folder.name_folder}</h5>
-                {/* Jika ada informasi tambahan, ganti 'folder.description' sesuai dengan properti yang sesuai */}
+
                 <p className="card-text">Folder Description or Content</p>
-                <a href="#" className="btn btn-primary">
+                <Link
+                  className="btn btn-primary"
+                  to={'/all-text/' + folder.name_folder}
+                >
                   Open Folder
-                </a>
+                </Link>
               </div>
             </div>
           </div>

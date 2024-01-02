@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './css/findMarkdown.css';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import Markdown from 'react-markdown';
@@ -33,8 +34,6 @@ export default function FindMarkdown() {
           <div className="row">
             <div className="col-md-8 offset-md-2">
               <div className="blog-post">
-                {' '}
-                {/* Tambahkan class text-center di sini */}
                 <h1 className="blog-title">{markdown.title}</h1>
                 <p className="blog-metadata">
                   Date: {markdown.date} | Author: {markdown.author}

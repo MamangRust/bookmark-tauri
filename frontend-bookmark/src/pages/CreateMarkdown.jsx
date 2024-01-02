@@ -28,12 +28,12 @@ export default function CreateMarkdown() {
     };
 
     axios
-      .post('http://localhost:8000/file/create', createFile) // Ganti URL dengan endpoint yang benar
+      .post('http://localhost:8000/file/create', createFile)
       .then((response) => {
         console.log(response.data);
       })
       .catch((error) => {
-        console.log(error); // Tangani kesalahan jika ada
+        console.log(error);
       });
 
     console.log('Nilai yang disimpan:', savedValue);
@@ -47,7 +47,7 @@ export default function CreateMarkdown() {
         type="text"
         placeholder="Masukkan judul"
         value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={(e) => handleTitleChange(e)}
       />
       <MDEditor value={value} onChange={handleEditorChange} />
       <Markdown
