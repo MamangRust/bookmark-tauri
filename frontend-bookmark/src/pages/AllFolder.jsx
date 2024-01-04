@@ -7,7 +7,7 @@ export default function AllFolder() {
 
   useEffect(() => {
     axios
-      .get('http://localhost:8000/folder') // Ganti URL sesuai dengan endpoint yang benar
+      .get('http://localhost:8000/folder')
       .then((response) => {
         setFolders(response.data);
       })

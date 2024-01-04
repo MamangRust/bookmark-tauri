@@ -1,17 +1,11 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
-
 type Post struct {
-	gorm.Model
-
-	PostID     uint   `gorm:"primaryKey"`
-	Title      string `gorm:"not null"`
-	Content    string
-	UserID     uint     `gorm:"not null"`
-	User       User     `gorm:"foreignKey:UserID"`
+	ID         uint     `gorm:"primaryKey;unique"`
+	Title      string   `gorm:"not null"`
+	Content    string   `gorm:"not null"`
 	CategoryID uint     `gorm:"not null"`
 	Category   Category `gorm:"foreignKey:CategoryID"`
+	UserID     uint     `gorm:"not null"`
+	User       User     `gorm:"foreignKey:UserID"`
 }

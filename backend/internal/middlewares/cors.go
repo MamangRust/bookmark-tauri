@@ -1,13 +1,6 @@
-package main
+package middlewares
 
-import (
-	"bookmark-backend/router"
-	"log"
-	"net/http"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-)
+import "net/http"
 
 func MiddlewareCors(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -21,19 +14,4 @@ func MiddlewareCors(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
-}
-
-func main() {
-
-	r := chi.NewRouter()
-
-	r.Use(middleware.Logger)
-	r.Use(MiddlewareCors)
-
-	router.NewFolderRouter("/folder", r)
-	router.NewFileRouter("/file", r)
-
-	log.Println("Connected to port: 8000")
-
-	http.ListenAndServe(":8000", r)
 }

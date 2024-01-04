@@ -1,17 +1,9 @@
 package models
 
-import (
-	"time"
-
-	"gorm.io/gorm"
-)
-
 type Category struct {
-	gorm.Model
-	CategoryID  uint   `gorm:"primaryKey"`
-	Name        string `gorm:"not null"`
+	ID          uint   `gorm:"primaryKey;unique"`
+	Name        string `gorm:"unique;not null"`
 	Image       string `gorm:"not null"`
-	Description string
-	CreatedAt   time.Time
+	Description string `gorm:"not null"`
 	Posts       []Post `gorm:"foreignKey:CategoryID"`
 }
