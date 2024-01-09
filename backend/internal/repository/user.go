@@ -48,7 +48,7 @@ func (r *userRepository) FindUserByID(userID int) (*models.User, error) {
 
 	db := r.db.Model(&user)
 
-	checkUser := db.Debug().Where("user_id = ?", userID).First(&user)
+	checkUser := db.Debug().Where("id = ?", userID).First(&user)
 
 	if checkUser.RowsAffected < 1 {
 		return &user, gorm.ErrRecordNotFound
@@ -88,7 +88,7 @@ func (r *userRepository) UpdateUser(id int, request request.UpdateUserRequest) (
 
 	db := r.db.Model(&user)
 
-	checkUser := db.Debug().Where("user_id = ?", id).First(&user)
+	checkUser := db.Debug().Where("id = ?", id).First(&user)
 
 	if checkUser.RowsAffected < 1 {
 		return nil, gorm.ErrRecordNotFound
@@ -113,7 +113,7 @@ func (r *userRepository) DeleteUser(id int) error {
 
 	db := r.db.Model(&user)
 
-	checkUser := db.Debug().Where("user_id = ?", id).First(&user)
+	checkUser := db.Debug().Where("id = ?", id).First(&user)
 
 	if checkUser.RowsAffected < 1 {
 

@@ -33,7 +33,7 @@ func (s *authService) Login(request request.LoginUserRequest) (*request.Token, *
 		}
 	}
 
-	passwordErr := s.hash.ComparePassword(request.Password, user.Password)
+	passwordErr := s.hash.ComparePassword(user.Password, request.Password)
 	if passwordErr != nil {
 		s.logger.Error("Error comparing password", zap.Error(passwordErr), zap.String("password", request.Password))
 		return nil, &response.ServiceError{

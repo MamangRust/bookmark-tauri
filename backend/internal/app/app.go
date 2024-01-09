@@ -9,11 +9,14 @@ import (
 	"bookmark-backend/pkg/dotenv"
 	"bookmark-backend/pkg/hash"
 	"bookmark-backend/pkg/logger"
+	"bookmark-backend/pkg/mapper"
+	"bookmark-backend/pkg/upload"
 	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"time"
 
 	"github.com/spf13/viper"
@@ -24,6 +27,10 @@ func Run() {
 
 	if err != nil {
 		log.Fatal("err")
+	}
+
+	if runtime.NumCPU() > 2 {
+		runtime.GOMAXPROCS(runtime.NumCPU() / 2)
 	}
 
 	err = dotenv.Viper()
@@ -46,41 +53,53 @@ func Run() {
 
 	if err != nil {
 		log.Fatal(err.Error())
+
 	}
+
+	mapper := mapper.NewMapper()
 
 	service := service.NewService(service.Deps{
 		Repository: repository,
-		Logger:     *log,
-		Hash:       *hashing,
+		Logger:     log,
+		Hash:       hashing,
 		Token:      token,
+		Mapper:     mapper,
 	})
 
-	myhandler := handler.NewHandler(service, token)
+	image := upload.NewImage(service.File, service.Folder)
+
+	myhandler := handler.NewHandler(service, token, image)
+
+	// staticDir := http.Dir(viper.GetString("STATIC_DIR"))
+
+	// fs := http.FileServer(http.Dir(staticDir))
+	// http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	serve := &http.Server{
 		Addr:         fmt.Sprintf(":%s", viper.GetString("PORT")),
-		IdleTimeout:  120 * 1000,
-		WriteTimeout: 15 * 60 * 1000,
-		ReadTimeout:  15 * 60 * 1000,
-		Handler:      myhandler.Init(),
+		WriteTimeout: time.Duration(viper.GetInt("WRITE_TIME_OUT")) * time.Second * 10,
+		ReadTimeout:  time.Duration(viper.GetInt("READ_TIME_OUT")) * time.Second * 10,
+
+		IdleTimeout: time.Second * 60,
+		Handler:     myhandler.Init(),
 	}
 
 	go func() {
-		if err := serve.ListenAndServe(); err != nil {
+		err := serve.ListenAndServe()
+
+		if err != nil {
 			log.Fatal(err.Error())
 		}
 	}()
 
-	log.Info("Server running on port :8080")
+	log.Info("Connected to port: " + viper.GetString("PORT"))
 
 	c := make(chan os.Signal, 1)
-
 	signal.Notify(c, os.Interrupt)
 
 	<-c
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	serve.Shutdown(ctx)

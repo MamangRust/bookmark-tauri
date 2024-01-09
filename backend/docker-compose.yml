@@ -5,42 +5,49 @@ services:
     container_name: bookmark_db
     image: postgres:15.5-alpine
     env_file:
-      - ./.env_docker
+      - .env
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
-
     ports:
       - "5435:5432"
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U holyraven -d bookmark_db" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    restart: unless-stopped
     volumes:
       - db:/var/lib/postgresql/data
+
+    networks:
+      - bookmark
 
   api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
     env_file:
-      - ./.env_docker
-    container_name: bookmark_api
+      - .env
+    ports:
+      - "5000:5000"
+    restart: on-failure
+    volumes:
+      - api_server:/app/
     depends_on:
       - database
-    ports:
-      - '8000:8000'
-    restart: always
+
     environment:
       - JWT_SECRET=${JWT_SECRET}
-      - DB_HOST=database
-      - DB_USER=holyraven
-      - DB_PASSWORD=holyraven
-      - DB_NAME=bookmark_db
-      - DB_PORT=5432 # Ubah dari 5435 menjadi 5432
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
       - PORT=${PORT}
+    networks:
+      - bookmark
 
 volumes:
+  api_server:
   db:
+
+
+networks:
+  bookmark:
+    driver: bridge

@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"bookmark-backend/internal/domain/request"
 	"bookmark-backend/internal/models"
 
 	"gorm.io/gorm"
@@ -20,7 +19,7 @@ func (r *postsRepository) FindAllPosts() (*[]models.Post, error) {
 
 	db := r.db.Model(&posts)
 
-	checkPosts := db.Debug().Find(&posts)
+	checkPosts := db.Debug().Preload("User").Find(&posts)
 
 	if checkPosts.RowsAffected < 1 {
 		return nil, gorm.ErrRecordNotFound
@@ -32,7 +31,7 @@ func (r *postsRepository) FindAllPosts() (*[]models.Post, error) {
 func (r *postsRepository) FindPostByID(postID int) (*models.Post, error) {
 	var post models.Post
 
-	checkPost := r.db.Debug().Where("post_id = ?", postID).Find(&post)
+	checkPost := r.db.Debug().Preload("User").Where("id = ?", postID).Find(&post)
 
 	if checkPost.RowsAffected < 1 {
 		return &post, gorm.ErrRecordNotFound
@@ -55,7 +54,7 @@ func (r *postsRepository) FindPostByTitle(title string) (*models.Post, error) {
 	return &post, nil
 }
 
-func (r *postsRepository) CreatePost(request request.CreatePostRequest) (*models.Post, error) {
+func (r *postsRepository) CreatePost(request models.Post) (*models.Post, error) {
 	var newPost models.Post
 
 	db := r.db.Model(&newPost)
@@ -81,12 +80,12 @@ func (r *postsRepository) CreatePost(request request.CreatePostRequest) (*models
 
 }
 
-func (r *postsRepository) UpdatePost(request request.UpdatePostRequest) (*models.Post, error) {
+func (r *postsRepository) UpdatePost(request models.Post) (*models.Post, error) {
 	var post models.Post
 
 	db := r.db.Model(&post)
 
-	checkPost := db.Debug().Where("post_id = ?", post.ID).First(&post)
+	checkPost := db.Debug().Where("id = ?", request.ID).First(&post)
 
 	if checkPost.RowsAffected < 1 {
 		return nil, gorm.ErrRecordNotFound
@@ -111,7 +110,7 @@ func (r *postsRepository) DeletePost(id int) error {
 
 	db := r.db.Model(&post)
 
-	checkPost := db.Debug().Where("post_id = ?", id).First(&post)
+	checkPost := db.Debug().Where("id = ?", id).First(&post)
 
 	if checkPost.RowsAffected < 1 {
 		return gorm.ErrRecordNotFound
